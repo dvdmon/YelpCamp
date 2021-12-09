@@ -3,6 +3,7 @@ const router = express.Router();
 const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
 const Campground = require('../models/campground');
+const User = require('../models/user');
 const { campgroundJoiSchema } = require('../schemas.js');
 const { isLoggedIn } = require('../middleware');
 
@@ -28,9 +29,11 @@ router.get('/new', isLoggedIn, (req, res) => {
     res.render('campgrounds/new')
 })
 
-
+// 'show' route
 router.get('/:id', catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate('reviews');
+    // create a campground object that 'populates' (fills out) the associated review objects
+    // and author objects so they can be referenced in the view
+    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');
     if (!campground) {
         req.flash('error', 'Cannot find that campground.');
         return res.redirect('/campgrounds')
@@ -39,9 +42,12 @@ router.get('/:id', catchAsync(async (req, res) => {
 
 }))
 
+
+// Create route
 router.post('/', isLoggedIn, validateCampgound, catchAsync(async (req, res, next) => {
     //if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400);
     const campground = new Campground(req.body.campground);
+    campground.author = req.user._id;
     await campground.save();
     req.flash('success', 'Successfully made a new campground!')
     res.redirect(`/campgrounds/${campground._id}`);
