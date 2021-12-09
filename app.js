@@ -62,6 +62,7 @@ app.use(morgan('tiny'));
 // middleware that runs for every route and checks whether there's a flash message with the
 // category of success (or error) and adds it to the res.locals object under the key of success.
 app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
