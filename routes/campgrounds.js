@@ -19,7 +19,12 @@ router.get('/new', isLoggedIn, (req, res) => {
 router.get('/:id', catchAsync(async (req, res) => {
     // create a campground object that 'populates' (fills out) the associated review objects
     // and author objects so they can be referenced in the view
-    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');
+    const campground = await Campground.findById(req.params.id).populate({
+        path: 'reviews',
+        populate: {
+            path: 'author'
+        }
+    }).populate('author');
     if (!campground) {
         req.flash('error', 'Cannot find that campground.');
         return res.redirect('/campgrounds')
