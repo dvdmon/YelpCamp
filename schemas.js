@@ -9,7 +9,8 @@ module.exports.campgroundJoiSchema = campgroundJoiSchema = Joi.object({
         price: Joi.number().required().min(0),
         //image: Joi.string().required(),
         description: Joi.string().required()
-    }).required()
+    }).required(),
+    deleteImages: Joi.array()
 })
 
 // Validation for review objects
