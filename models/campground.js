@@ -2,14 +2,23 @@ const mongoose = require('mongoose');
 const review = require('./review');
 const Schema = mongoose.Schema;
 
+const ImageSchema = new Schema({
+    url: String,
+    filename: String
+});
+//create a "virtual ("computed"?) field that looks like it's coming from our database
+// it will return a version of the url which has been customized with an additional
+// piece that resizes it via Cloudinary to make it smaller (width 200), IE a thumbnail
+// We also took the images array out of the CampgroundSchema to do this, and then just
+// refer to this new Schema in the CampgroundSchema
+
+ImageSchema.virtual('thumbnail').get(function () {
+    return this.url.replace('/upload', '/upload/w_200');
+});
+
 const CampgroundSchema = new Schema({
     title: String,
-    images: [
-        {
-            url: String,
-            filename: String
-        }
-    ],
+    images: [ImageSchema],
     price: Number,
     description: String,
     location: String,
