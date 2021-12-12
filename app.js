@@ -15,6 +15,7 @@ const ExpressError = require('./utils/ExpressError');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const mongoSanitize = require('express-mongo-sanitize');
 
 
 
@@ -58,6 +59,7 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
+app.use(mongoSanitize());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
