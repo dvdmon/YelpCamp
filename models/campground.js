@@ -2,19 +2,27 @@ const mongoose = require('mongoose');
 const review = require('./review');
 const Schema = mongoose.Schema;
 
-const ImageSchema = new Schema({
-    url: String,
-    filename: String
-});
 //create a "virtual ("computed"?) field that looks like it's coming from our database
 // it will return a version of the url which has been customized with an additional
 // piece that resizes it via Cloudinary to make it smaller (width 200), IE a thumbnail
 // We also took the images array out of the CampgroundSchema to do this, and then just
 // refer to this new Schema in the CampgroundSchema
-
+const ImageSchema = new Schema({
+    url: String,
+    filename: String
+});
 ImageSchema.virtual('thumbnail').get(function () {
     return this.url.replace('/upload', '/upload/w_200');
 });
+
+// By default, mongoose does not include virtuals when you convert a document to JSON, EG
+// when you pass a docuemtn to Express via res.json(), so we must set the option here to enable it
+const opts = { toJSON: { virtuals: true } };
+
+
+
+
+
 
 const CampgroundSchema = new Schema({
     title: String,
@@ -42,6 +50,17 @@ const CampgroundSchema = new Schema({
             ref: 'Review'
         }
     ]
+}, opts);
+
+// createa another virtual field, this time specifying that it should create a property
+// called 'properties' and then have that properies property be an object containing a
+// string called popUpMarkup
+CampgroundSchema.virtual('properties.popUpMarkup').get(function () {
+    return `
+    <strong><a href="campgrounds/${this._id}">${this.title}</a></strong>
+    <p>${this.location}</p>
+    <p>${this.description.substring(0, 20)}...</p>
+    `;
 });
 
 // Mongoose middleware that runs post (after) the 'findOneAndDelete' method - 

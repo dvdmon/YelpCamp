@@ -26,7 +26,7 @@ const seedDB = async () => {
 
     // now loop 50 times to create a set of randomly generated campgrounds based on cities.js
     // and seedHelpers.js.
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 400; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
         const camp = new Campground({
