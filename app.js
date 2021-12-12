@@ -14,7 +14,12 @@ const { title } = require('process');
 const campgrounds = require('./routes/campgrounds');
 const reviews = require('./routes/reviews');
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp')
+const password = 'tASTkkkzXcBM6dfU'
+const uid = 'leviwallach'
+const MONGODB_URI = `mongodb+srv://${uid}:${password}@cluster0.en4vy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+
+//connect to Mongoose
+mongoose.connect(MONGODB_URI)
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
