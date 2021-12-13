@@ -17,6 +17,7 @@ const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
+const MongoDBStore = require('connect-mongo');
 
 
 
@@ -26,7 +27,9 @@ const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
 const { contentSecurityPolicy } = require('helmet');
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp')
+const dbURL = "mongodb://localhost:27017/yelp-camp";
+//dbURL = process.env.DB_URL;
+mongoose.connect(dbURL);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
@@ -45,7 +48,20 @@ app.use(methodOverride('_method'));
 //sets a static folder to hold js, css, etc. files so they can be referenced in our files
 app.use(express.static(path.join(__dirname, 'public')))
 
+const store = MongoDBStore.create({
+    mongoUrl: dbURL,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisisnotagoodsecret'
+    }
+});
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
 const sessionConfig = {
+    store,
     name: 'YelpCampLW',
     secret: 'thisshouldbeabettersecret',
     resave: false,
