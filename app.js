@@ -47,8 +47,12 @@ app.use(methodOverride('_method'));
 
 //sets a static folder to hold js, css, etc. files so they can be referenced in our files
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(mongoSanitize({
+    replaceWith: '_'
+}))
 
 const secret = process.env.SECRET || 'thisshouldbeabettersecret'
+
 const store = MongoDBStore.create({
     mongoUrl: dbURL,
     touchAfter: 24 * 60 * 60,
@@ -77,6 +81,7 @@ const sessionConfig = {
 
 app.use(session(sessionConfig))
 app.use(flash());
+app.use(helmet());
 
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com",
@@ -126,12 +131,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
-app.use(mongoSanitize());
+
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use(morgan('tiny'));
+//app.use(morgan('tiny'));
 
 // middleware that runs for every route and checks whether there's a flash message with the
 // category of success (or error) and adds it to the res.locals object under the key of success.
